@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Outerface | Interactive Generative AI Face & Wallpaper Engine</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Computer Outerface is a generative interactive art installation and digital face engine. Create unique, stylized computer personalities with customizable eyes, pupils, eyebrows, and mouths. Features real-time microphone reactivity, breathing animations, and 4K wallpaper export capabilities.">
+    <meta name="keywords" content="Computer Outerface, generative art, interactive face, wallpaper engine, web art, CRT aesthetic, microphone reactive art, SVG faces, digital avatar creator">
+    <link rel="canonical" href="https://pirillo.com/arcade/computer-outerface.html">
+    <meta name="author" content="Chris Pirillo">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pirillo.com/arcade/computer-outerface.html">
+    <meta property="og:title" content="Computer Outerface | Interactive Generative AI Face Engine">
+    <meta property="og:description" content="Design and interact with a generative computer face. Features voice reactivity and 4K exports.">
+    <meta property="og:image" content="https://pirillo.com/arcade/images/computer-outerface.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://pirillo.com/arcade/computer-outerface.html">
+    <meta property="twitter:title" content="Computer Outerface | Interactive Generative AI Face Engine">
+    <meta property="twitter:description" content="Customizable digital personalities with real-time audio reactivity.">
+    <meta property="twitter:image" content="https://pirillo.com/arcade/images/computer-outerface.png">
+    <meta name="twitter:creator" content="@ChrisPirillo">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Computer Outerface",
+      "url": "https://pirillo.com/arcade/computer-outerface.html",
+      "description": "An interactive generative art application creating unique computer faces with audio-reactive capabilities.",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Web Browser",
+      "author": {
+        "@type": "Person",
+        "name": "Chris Pirillo",
+        "url": "https://pirillo.com/"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1CQ4D3VQ3L"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-1CQ4D3VQ3L');
+    </script>
+
+    <!-- Performance: Resource Hints -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    
+    <style>
+        :root {
+            --ui-bg: rgba(0, 0, 0, 0.95);
+            --ui-text: #00ff41;
+            --ui-border: #00ff41;
+            --accent: #fff;
+            --menu-color: rgba(255, 255, 255, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Press Start 2P', cursive;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            transition: opacity 0.2s ease-in-out;
+            opacity: 1;
+        }
+
+        canvas {
+            display: block;
+            image-rendering: pixelated; /* Optimization for pixel art style */
+        }
+
+        #scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0,0,0,0.15) 50%,
+                rgba(0,0,0,0.15)
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+            display: none;
+        }
+
+        #menu-btn {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 60px;
+            height: 60px;
+            z-index: 101;
+            cursor: pointer;
+            background: transparent;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            border: none;
+            padding: 0;
+        }
+
+        #menu-btn:hover {
+            opacity: 1.0;
+        }
+
+        #menu-btn div {
+            width: 24px;
+            height: 3px;
+            background-color: var(--menu-color);
+            transition: background-color 0.5s ease;
+        }
+
+        #settings-panel {
+            position: fixed;
+            top: 0;
+            left: -400px;
+            width: 320px;
+            height: 100%;
+            background-color: var(--ui-bg);
+            border-right: 2px solid var(--ui-border);
+            z-index: 100;
+            transition: left 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            color: var(--ui-text);
+            font-size: 10px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: -100px 0 0 var(--ui-bg);
+        }
+
+        #settings-panel.open {
+            left: 0;
+        }
+
+        #panel-header {
+            flex: 0 0 auto;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding-left: 60px;
+            background-color: #000;
+            border-bottom: 2px solid var(--ui-border);
+            z-index: 10;
+        }
+
+        #panel-header h2 {
+            margin: 0;
+            line-height: 1;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            color: #ffff00;
+            padding-top: 3px; 
+        }
+
+        #panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 1px dashed #333;
+            padding-bottom: 15px;
+        }
+
+        .control-group h3 {
+            margin-top: 0;
+            font-size: 11px;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            margin-top: 10px;
+            color: #aaa;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            background: #333;
+            outline: none;
+            border: 1px solid #555;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 10px;
+            height: 16px;
+            background: var(--ui-border);
+            cursor: pointer;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .color-item label {
+            margin-top: 0;
+            font-size: 8px;
+        }
+
+        input[type="color"] {
+            width: 100%;
+            height: 25px;
+            border: 1px solid var(--ui-border);
+            background: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: transparent;
+            border: 1px solid var(--ui-border);
+            color: var(--ui-border);
+            font-family: 'Press Start 2P', cursive;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 9px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        button:hover {
+            background: var(--ui-border);
+            color: #000;
+        }
+
+        button.primary {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        button.primary:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .val-display {
+            float: right;
+            color: var(--accent);
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--ui-border); }
+
+        @media (max-width: 600px) {
+            #settings-panel { width: 85%; }
+        }
+        
+        /* SEO Visibility Class */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="sr-only">
+        <h1>Computer Outerface</h1>
+        <p>An interactive generative digital face by Chris Pirillo.</p>
+    </header>
+
+    <div id="scanlines" aria-hidden="true"></div>
+
+    <main id="canvas-container">
+        <canvas id="faceCanvas" title="The Computer Outerface visualization"></canvas>
+    </main>
+
+    <!-- UI Controls -->
+    <button id="menu-btn" aria-label="Toggle Settings Menu" aria-expanded="false">
+        <div></div>
+        <div></div>
+        <div></div>
+    </button>
+
+    <nav id="settings-panel" aria-label="Application Settings">
+        <div id="panel-header">
+            <h2>Computer Outerface</h2>
+        </div>
+        
+        <div id="panel-content">
+            <section class="control-group">
+                <h3>Actions</h3>
+                <button class="primary" id="btn-randomize">Randomize (Click Screen)</button>
+                <button id="btn-reset">Reset Defaults</button>
+                <button id="btn-export">Export 4K Wallpaper</button>
+            </section>
+
+            <section class="control-group">
+                <h3>Palette</h3>
+                <label>
+                    <input type="checkbox" id="chk-mono"> Monochromatic Mode
+                </label>
+                <div class="color-grid">
+                    <div class="color-item">
+                        <label for="col-bg">Background</label>
+                        <input type="color" id="col-bg" value="#2c3e50">
+                    </div>
+                    <div class="color-item">
+                        <label for="col-eyes">Eyes</label>
+                        <input type="color" id="col-eyes" value="#ecf0f1">
+                    </div>
+                    <div class="color-item">
+                        <label for="col-pupils">Pupils</label>
+                        <input type="color" id="col-pupils" value="#000000">
+                    </div>
+                    <div class="color-item">
+                        <label for="col-brows">Eyebrows</label>
+                        <input type="color" id="col-brows" value="#ecf0f1">
+                    </div>
+                    <div class="color-item">
+                        <label for="col-mouth">Mouth</label>
+                        <input type="color" id="col-mouth" value="#ecf0f1">
+                    </div>
+                </div>
+            </section>
+
+            <section class="control-group">
+                <h3>Animation</h3>
+                <label>
+                    <input type="checkbox" id="chk-breathing" checked> Enable Breathing
+                </label>
+                <label>
+                    <input type="checkbox" id="chk-mic"> Microphone Input
+                </label>
+                <label for="rng-breath-speed">Speed Variance</label>
+                <input type="range" id="rng-breath-speed" min="1" max="50" value="10">
+            </section>
+
+            <section class="control-group">
+                <h3>System</h3>
+                <label>
+                    <input type="checkbox" id="chk-scanlines"> CRT Scanlines
+                </label>
+            </section>
+
+            <section class="control-group">
+                <h3>Eyes</h3>
+                <label for="rng-eye-w">Width</label>
+                <input type="range" id="rng-eye-w" min="20" max="300" value="80">
+                <label for="rng-eye-h">Height</label>
+                <input type="range" id="rng-eye-h" min="20" max="300" value="80">
+                <label for="rng-eye-gap">Spacing (Gap)</label>
+                <input type="range" id="rng-eye-gap" min="0" max="400" value="150">
+                <label for="rng-eye-y">Vertical Position</label>
+                <input type="range" id="rng-eye-y" min="-200" max="200" value="0">
+            </section>
+
+            <section class="control-group">
+                <h3>Pupils</h3>
+                <label for="rng-pupil-size">Size</label>
+                <input type="range" id="rng-pupil-size" min="5" max="90" value="40">
+                <label for="rng-pupil-aspect">Shape (Aspect)</label>
+                <input type="range" id="rng-pupil-aspect" min="2" max="30" step="1" value="10">
+                <div style="font-size: 8px; color: #666; display:flex; justify-content:space-between;" aria-hidden="true"><span>Wide</span><span>Square</span><span>Tall</span></div>
+            </section>
+
+            <section class="control-group">
+                <h3>Eyebrows</h3>
+                <label>
+                    <input type="checkbox" id="chk-brows-show" checked> Show Eyebrows
+                </label>
+                <label>
+                    <input type="checkbox" id="chk-brows-asym"> Asymmetry
+                </label>
+                <label for="rng-brow-width">Width</label>
+                <input type="range" id="rng-brow-width" min="20" max="300" value="100">
+                <label for="rng-brow-thick">Thickness</label>
+                <input type="range" id="rng-brow-thick" min="5" max="80" value="20">
+                <label for="rng-brow-y">Offset Y (From Eye)</label>
+                <input type="range" id="rng-brow-y" min="0" max="250" value="40">
+                <label for="rng-brow-angle">Angle</label>
+                <input type="range" id="rng-brow-angle" min="-80" max="80" value="0">
+            </section>
+
+            <section class="control-group">
+                <h3>Mouth</h3>
+                <label for="rng-mouth-w">Width</label>
+                <input type="range" id="rng-mouth-w" min="20" max="600" value="200">
+                <label for="rng-mouth-h">Height</label>
+                <input type="range" id="rng-mouth-h" min="5" max="300" value="40">
+                <label for="rng-mouth-y">Vertical Position</label>
+                <input type="range" id="rng-mouth-y" min="50" max="400" value="150">
+            </section>
+
+            <section class="control-group">
+                <h3>Auto-Advance</h3>
+                <label>
+                    <input type="checkbox" id="chk-autoadvance"> Enabled
+                </label>
+                <label>Interval: <span id="lbl-autoadvance-val" class="val-display">2.0</span>s</label>
+                <input type="range" id="rng-autoadvance" min="0.5" max="10.0" step="0.5" value="2.0">
+            </section>
+        </div>
+    </nav>
+
+    <footer class="sr-only">
+        Created by @ChrisPirillo. Available at Chris Pirillo's Arcade.
+    </footer>
+
+    <script>
+        // --- Configuration & State ---
+        const config = {
+            colors: {
+                monochromatic: false,
+                bg: '#2c3e50',
+                eyes: '#ecf0f1',
+                pupils: '#000000',
+                brows: '#ecf0f1',
+                mouth: '#ecf0f1'
+            },
+            animation: {
+                breathing: true,
+                speedMultiplier: 1.0,
+                micEnabled: false
+            },
+            eyes: { w: 80, h: 80, gap: 150, yOffset: 0 },
+            pupils: { sizePercent: 40, aspect: 1 },
+            brows: { visible: true, asymmetric: false, width: 100, thickness: 20, yOffset: 40, angle: 0 },
+            mouth: { width: 200, height: 40, yOffset: 150, style: 'solid' },
+            system: { scanlines: false, autoAdvanceEnabled: false, autoAdvanceTime: 2.0 }
+        };
+
+        const animState = {
+            time: 0,
+            blinkOpen: 1, blinkTimer: 0, nextBlink: 200, 
+            pupilTargetX: 0, pupilTargetY: 0,
+            pupilCurrentX: 0, pupilCurrentY: 0,
+            lookTimer: 0, nextLook: 100,
+            eyeBreathY: 0, mouthBreathY: 0,
+            mouthMorphW: 0, mouthMorphH: 0, mouthTimer: 0,
+            browMorphY: 0, browTimer: 0,
+            audioMouthOpen: 0
+        };
+
+        let audioCtx, analyser, dataArray, micSource;
+
+        const canvas = document.getElementById('faceCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('canvas-container');
+        const settingsPanel = document.getElementById('settings-panel');
+        const menuBtn = document.getElementById('menu-btn');
+        const scanlines = document.getElementById('scanlines');
+
+        let autoAdvanceInterval = null;
+
+        function init() {
+            resizeCanvas();
+            bindEvents();
+            randomizeSettings();
+            loop();
+        }
+
+        async function toggleAudio(active) {
+            if (active) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    analyser = audioCtx.createAnalyser();
+                    analyser.fftSize = 256;
+                    micSource = audioCtx.createMediaStreamSource(stream);
+                    micSource.connect(analyser);
+                    dataArray = new Uint8Array(analyser.frequencyBinCount);
+                    config.animation.micEnabled = true;
+                } catch (err) {
+                    console.error("Microphone access denied or error:", err);
+                    document.getElementById('chk-mic').checked = false;
+                    config.animation.micEnabled = false;
+                    // Note: Browser message boxes are used as per requirements
+                }
+            } else {
+                if (audioCtx && audioCtx.state !== 'closed') {
+                    audioCtx.close();
+                }
+                config.animation.micEnabled = false;
+            }
+        }
+
+        function update() {
+            animState.time++;
+
+            animState.blinkTimer++;
+            if (animState.blinkTimer > animState.nextBlink) {
+                animState.blinkOpen -= 0.15;
+                if (animState.blinkOpen <= 0) {
+                    animState.blinkOpen = 0;
+                    animState.blinkTimer = 0;
+                    animState.nextBlink = Math.random() * 300 + 100;
+                }
+            } else if (animState.blinkOpen < 1) {
+                animState.blinkOpen += 0.15;
+                if (animState.blinkOpen > 1) animState.blinkOpen = 1;
+            }
+
+            animState.lookTimer++;
+            if (animState.lookTimer > animState.nextLook) {
+                animState.pupilTargetX = (Math.random() * 2 - 1) * 0.8;
+                animState.pupilTargetY = (Math.random() * 2 - 1) * 0.5;
+                animState.lookTimer = 0;
+                animState.nextLook = Math.random() * 200 + 50;
+            }
+            animState.pupilCurrentX += (animState.pupilTargetX - animState.pupilCurrentX) * 0.15;
+            animState.pupilCurrentY += (animState.pupilTargetY - animState.pupilCurrentY) * 0.15;
+
+            if (config.animation.breathing) {
+                const speed = 0.03 * config.animation.speedMultiplier;
+                const t = animState.time;
+                animState.eyeBreathY = Math.sin(t * speed) * 5;
+                animState.mouthBreathY = Math.sin(t * speed - 0.5) * 6; 
+            } else {
+                animState.eyeBreathY = 0;
+                animState.mouthBreathY = 0;
+            }
+
+            if (config.animation.micEnabled && analyser && dataArray) {
+                analyser.getByteFrequencyData(dataArray);
+                let sum = 0;
+                for(let i = 0; i < dataArray.length; i++) {
+                    sum += dataArray[i];
+                }
+                const avg = sum / dataArray.length;
+                let norm = avg / 255;
+                if (norm < 0.04) norm = 0;
+                const sensitivity = 2.5; 
+                let targetOpen = norm * 300 * sensitivity;
+                const smoothing = (targetOpen > animState.audioMouthOpen) ? 0.6 : 0.3;
+                animState.audioMouthOpen += (targetOpen - animState.audioMouthOpen) * smoothing;
+                animState.mouthMorphH = 0;
+                animState.mouthMorphW = 0;
+            } else {
+                animState.audioMouthOpen = 0;
+                animState.mouthTimer++;
+                if (animState.mouthTimer > 20) {
+                    animState.mouthMorphW = (Math.random() * 20) - 10;
+                    animState.mouthMorphH = (Math.random() * 10) - 5;
+                    animState.mouthTimer = 0;
+                }
+            }
+
+            animState.browTimer++;
+            if (animState.browTimer > 60) {
+                animState.browMorphY = Math.sin(animState.time * 0.05) * 10;
+                if (Math.random() > 0.95) animState.browMorphY -= 15;
+                animState.browTimer = 0;
+            }
+        }
+
+        function draw(targetCtx = ctx, w = canvas.width, h = canvas.height) {
+            targetCtx.fillStyle = config.colors.bg;
+            targetCtx.fillRect(0, 0, w, h);
+
+            const cx = w / 2;
+            const cy = h / 2;
+
+            targetCtx.fillStyle = config.colors.eyes;
+            const baseEyeW = config.eyes.w;
+            const baseEyeH = config.eyes.h;
+            
+            const currentEyeH = Math.max(5, baseEyeH * animState.blinkOpen);
+            const eyeYCenter = cy + config.eyes.yOffset + animState.eyeBreathY;
+            const eyeY = eyeYCenter - (currentEyeH / 2);
+            const halfGap = config.eyes.gap / 2;
+
+            const leftEyeCenterX = cx - halfGap - (baseEyeW/2);
+            const rightEyeCenterX = cx + halfGap + (baseEyeW/2);
+            const leftEyeX = cx - halfGap - baseEyeW;
+            const rightEyeX = cx + halfGap;
+
+            targetCtx.fillRect(leftEyeX, eyeY, baseEyeW, currentEyeH);
+            targetCtx.fillRect(rightEyeX, eyeY, baseEyeW, currentEyeH);
+
+            if (animState.blinkOpen > 0.2) {
+                targetCtx.fillStyle = config.colors.pupils;
+                const aspect = config.pupils.aspect;
+                let pBaseSize = (config.pupils.sizePercent / 100) * Math.min(baseEyeW, baseEyeH);
+                let pW, pH;
+                
+                if (aspect > 1.5) { pW = pBaseSize * (1/aspect); pH = pBaseSize * aspect; } 
+                else if (aspect < 0.8) { pW = pBaseSize * (1/aspect); pH = pBaseSize * aspect; }
+                else { pW = pBaseSize; pH = pBaseSize; }
+
+                pW = Math.min(pW, baseEyeW * 0.9);
+                pH = Math.min(pH, currentEyeH * 0.9);
+
+                const maxMoveX = (baseEyeW - pW) / 2;
+                const maxMoveY = (currentEyeH - pH) / 2;
+                const px = animState.pupilCurrentX * maxMoveX;
+                let py = animState.pupilCurrentY * (baseEyeH/2); 
+                if (Math.abs(py) > maxMoveY) py = Math.sign(py) * maxMoveY;
+
+                targetCtx.fillRect(leftEyeX + (baseEyeW/2) - (pW/2) + px, eyeY + (currentEyeH/2) - (pH/2) + py, pW, pH);
+                targetCtx.fillRect(rightEyeX + (baseEyeW/2) - (pW/2) + px, eyeY + (currentEyeH/2) - (pH/2) + py, pW, pH);
+            }
+
+            if (config.brows.visible) {
+                targetCtx.fillStyle = config.colors.brows;
+                const browW = config.brows.width; 
+                const browH = config.brows.thickness;
+                const browAnimY = animState.browMorphY;
+                const browDrawY = eyeYCenter - (baseEyeH/2) - config.brows.yOffset + (animState.eyeBreathY * 0.5) + browAnimY;
+                let angleLeft = config.brows.angle;
+                let yLeft = browDrawY;
+                let angleRight = config.brows.angle;
+                let yRight = browDrawY;
+                if (config.brows.asymmetric) {
+                    angleRight = -angleLeft * 0.5;
+                    yRight -= 20; 
+                }
+                drawBlockyLine(targetCtx, leftEyeCenterX - (browW/2), yLeft + angleLeft, leftEyeCenterX + (browW/2), yLeft, browH);
+                drawBlockyLine(targetCtx, rightEyeCenterX - (browW/2), yRight, rightEyeCenterX + (browW/2), yRight + angleRight, browH);
+            }
+
+            targetCtx.fillStyle = config.colors.mouth;
+            const mumbleW = animState.mouthMorphW;
+            const mumbleH = animState.mouthMorphH;
+            const mouthW = Math.max(10, config.mouth.width + mumbleW);
+            let rawMouthH = Math.max(5, config.mouth.height + mumbleH + animState.audioMouthOpen);
+            const mouthX = cx - (mouthW / 2);
+            const mouthY = cy + config.mouth.yOffset + animState.mouthBreathY;
+            const padding = 40; 
+            const availableSpace = h - mouthY - padding;
+            let mouthH = Math.min(rawMouthH, availableSpace);
+            mouthH = Math.max(5, mouthH);
+            const style = config.mouth.style;
+            if (style === 'line') {
+                if (animState.audioMouthOpen > 5) {
+                    targetCtx.fillRect(mouthX, mouthY, mouthW, mouthH); 
+                } else {
+                    targetCtx.fillRect(mouthX, mouthY + (mouthH/2) - 5, mouthW, 10);
+                }
+            } else if (style === 'open') {
+                targetCtx.fillRect(mouthX, mouthY, mouthW, mouthH);
+                targetCtx.fillStyle = config.colors.bg;
+                const border = Math.min(10, mouthH/3);
+                if (mouthW > border*2 && mouthH > border*2) {
+                    targetCtx.fillRect(mouthX + border, mouthY + border, mouthW - border*2, mouthH - border*2);
+                }
+            } else if (style === 'teeth') {
+                const barWidth = 10;
+                const gap = 10;
+                const totalUnit = barWidth + gap;
+                const numBars = Math.floor((mouthW + gap) / totalUnit);
+                const totalContentWidth = (numBars * totalUnit) - gap;
+                const startX = mouthX + (mouthW - totalContentWidth) / 2;
+                for (let i = 0; i < numBars; i++) {
+                    targetCtx.fillRect(startX + (i * totalUnit), mouthY, barWidth, mouthH);
+                }
+            } else {
+                targetCtx.fillRect(mouthX, mouthY, mouthW, mouthH);
+            }
+        }
+
+        function drawBlockyLine(ctx, x1, y1, x2, y2, thickness) {
+            const steps = 10;
+            const dx = (x2 - x1) / steps;
+            const dy = (y2 - y1) / steps;
+            for (let i = 0; i < steps; i++) {
+                ctx.fillRect(x1 + (dx * i), y1 + (dy * i), Math.abs(dx) + 2, thickness);
+            }
+        }
+
+        function getLuminance(hex) {
+            const rgb = parseInt(hex.slice(1), 16);
+            const r = (rgb >> 16) & 0xff;
+            const g = (rgb >>  8) & 0xff;
+            const b = (rgb >>  0) & 0xff;
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        }
+
+        function adjustLuminance(hex, factor) {
+            let rgb = parseInt(hex.slice(1), 16);
+            let r = (rgb >> 16) & 0xff;
+            let g = (rgb >>  8) & 0xff;
+            let b = (rgb >>  0) & 0xff;
+            r = Math.min(255, Math.max(0, r * factor));
+            g = Math.min(255, Math.max(0, g * factor));
+            b = Math.min(255, Math.max(0, b * factor));
+            return "#" + ((1 << 24) + (Math.floor(r) << 16) + (Math.floor(g) << 8) + Math.floor(b)).toString(16).slice(1);
+        }
+
+        function generateRandomColor() {
+            const r = Math.floor(Math.random() * 255);
+            const g = Math.floor(Math.random() * 255);
+            const b = Math.floor(Math.random() * 255);
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+
+        function generateContrastingColor(baseHex, threshold = 60) {
+            let color, lumDiff;
+            const baseLum = getLuminance(baseHex);
+            let attempts = 0;
+            do {
+                color = generateRandomColor();
+                const lum = getLuminance(color);
+                lumDiff = Math.abs(lum - baseLum);
+                attempts++;
+            } while (lumDiff < threshold && attempts < 20);
+            if (lumDiff < threshold) {
+                const rgb = parseInt(baseHex.slice(1), 16);
+                const inv = 0xFFFFFF ^ rgb;
+                color = "#" + ("000000" + inv.toString(16)).slice(-6);
+            }
+            return color;
+        }
+
+        function updateMenuColor() {
+            const bgLum = getLuminance(config.colors.bg);
+            let menuColor;
+            if (bgLum < 128) {
+                menuColor = adjustLuminance(config.colors.bg, 2.5);
+            } else {
+                menuColor = adjustLuminance(config.colors.bg, 0.4);
+            }
+            document.documentElement.style.setProperty('--menu-color', menuColor);
+        }
+
+        function updateColorsOnly() {
+            const bg = config.colors.bg;
+            let eyes, pupils, brows, mouth;
+            if (config.colors.monochromatic) {
+                const bgLum = getLuminance(bg);
+                const contrastFactor = bgLum < 128 ? 3.5 : 0.3;
+                const baseFeature = adjustLuminance(bg, contrastFactor);
+                eyes = baseFeature;
+                brows = baseFeature;
+                mouth = baseFeature;
+                pupils = adjustLuminance(baseFeature, bgLum < 128 ? 0.2 : 3.0); 
+            } else {
+                eyes = generateContrastingColor(bg, 50);
+                pupils = generateContrastingColor(eyes, 80);
+                brows = generateContrastingColor(bg, 50);
+                mouth = generateContrastingColor(bg, 50);
+            }
+            config.colors.eyes = eyes;
+            config.colors.pupils = pupils;
+            config.colors.brows = brows;
+            config.colors.mouth = mouth;
+            syncUiToConfig();
+            updateMenuColor();
+        }
+
+        function randomizeSettings() {
+            const r = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
+            const bg = generateRandomColor();
+            config.colors.bg = bg;
+            updateColorsOnly();
+            config.animation.speedMultiplier = Math.random() * 2.0 + 0.5;
+            config.eyes.w = r(20, 250); 
+            config.eyes.h = r(20, 250); 
+            config.eyes.gap = r(config.eyes.w + 10, 350); 
+            config.eyes.yOffset = r(-100, 50);
+            const pType = Math.random();
+            if (pType < 0.2) config.pupils.aspect = 0.5;
+            else if (pType < 0.8) config.pupils.aspect = 1.0;
+            else config.pupils.aspect = 2.0;
+            config.pupils.sizePercent = r(20, 90);
+            config.brows.visible = Math.random() > 0.15;
+            config.brows.asymmetric = Math.random() > 0.7; 
+            config.brows.thickness = r(10, 60);
+            config.brows.angle = r(-70, 70);
+            config.brows.yOffset = r(20, 150);
+            config.brows.width = r(config.eyes.w, config.eyes.w * 2.5);
+            const mStyles = ['solid', 'open', 'teeth', 'line'];
+            config.mouth.style = mStyles[Math.floor(Math.random() * mStyles.length)];
+            if (config.mouth.style === 'line') {
+                 config.mouth.width = r(50, 300);
+                 config.mouth.height = r(10, 20);
+            } else {
+                config.mouth.width = r(40, 350);
+                config.mouth.height = r(30, 150);
+            }
+            config.mouth.yOffset = r(100, 300);
+            enforceConstraints();
+            syncUiToConfig();
+        }
+
+        function triggerRandomize() {
+            container.style.opacity = '0';
+            setTimeout(() => {
+                randomizeSettings();
+                container.style.opacity = '1';
+            }, 250);
+        }
+
+        function enforceConstraints() {
+            const minBrowOffset = config.brows.thickness + Math.abs(config.brows.angle) + 10;
+            if (config.brows.yOffset < minBrowOffset) config.brows.yOffset = minBrowOffset;
+            const padding = 40;
+            const h = window.innerHeight;
+            const maxMouthYOffset = (h / 2) - config.mouth.height - padding;
+            if (config.mouth.yOffset > maxMouthYOffset) {
+                config.mouth.yOffset = maxMouthYOffset;
+            }
+            const eyeBottom = config.eyes.yOffset + (config.eyes.h / 2);
+            const minMouthY = eyeBottom + 20; 
+            if (config.mouth.yOffset < minMouthY) config.mouth.yOffset = minMouthY;
+            document.getElementById('rng-brow-y').value = config.brows.yOffset;
+            document.getElementById('rng-mouth-y').value = config.mouth.yOffset;
+        }
+
+        function syncUiToConfig() {
+            document.getElementById('chk-mono').checked = config.colors.monochromatic;
+            document.getElementById('chk-breathing').checked = config.animation.breathing;
+            document.getElementById('chk-mic').checked = config.animation.micEnabled;
+            document.getElementById('chk-brows-show').checked = config.brows.visible;
+            document.getElementById('chk-brows-asym').checked = config.brows.asymmetric;
+            document.getElementById('chk-autoadvance').checked = config.system.autoAdvanceEnabled;
+            document.getElementById('col-bg').value = config.colors.bg;
+            document.getElementById('col-eyes').value = config.colors.eyes;
+            document.getElementById('col-pupils').value = config.colors.pupils;
+            document.getElementById('col-brows').value = config.colors.brows;
+            document.getElementById('col-mouth').value = config.colors.mouth;
+            document.getElementById('rng-breath-speed').value = config.animation.speedMultiplier * 10;
+            document.getElementById('rng-eye-w').value = config.eyes.w;
+            document.getElementById('rng-eye-h').value = config.eyes.h;
+            document.getElementById('rng-eye-gap').value = config.eyes.gap;
+            document.getElementById('rng-eye-y').value = config.eyes.yOffset;
+            document.getElementById('rng-pupil-size').value = config.pupils.sizePercent;
+            document.getElementById('rng-pupil-aspect').value = config.pupils.aspect * 10;
+            document.getElementById('rng-brow-width').value = config.brows.width;
+            document.getElementById('rng-brow-thick').value = config.brows.thickness;
+            document.getElementById('rng-brow-y').value = config.brows.yOffset;
+            document.getElementById('rng-brow-angle').value = config.brows.angle;
+            document.getElementById('rng-mouth-w').value = config.mouth.width;
+            document.getElementById('rng-mouth-h').value = config.mouth.height;
+            document.getElementById('rng-mouth-y').value = config.mouth.yOffset;
+            document.getElementById('rng-autoadvance').value = config.system.autoAdvanceTime;
+            document.getElementById('lbl-autoadvance-val').innerText = config.system.autoAdvanceTime.toFixed(1);
+        }
+
+        function bindEvents() {
+            window.addEventListener('resize', resizeCanvas);
+            menuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleMenu();
+            });
+            document.addEventListener('click', (e) => {
+                const isMenuClick = settingsPanel.contains(e.target) || menuBtn.contains(e.target);
+                const isMenuOpen = settingsPanel.classList.contains('open');
+                if (isMenuOpen && !isMenuClick) toggleMenu(false);
+                else if (!isMenuOpen && !isMenuClick) triggerRandomize();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') toggleMenu(false);
+            });
+            document.getElementById('btn-randomize').onclick = triggerRandomize;
+            document.getElementById('btn-export').onclick = (e) => { e.stopPropagation(); export4K(); };
+            document.getElementById('btn-reset').onclick = () => {
+                config.colors.monochromatic = false;
+                config.animation.breathing = true;
+                toggleAudio(false);
+                config.eyes = { w: 80, h: 80, gap: 150, yOffset: 0 };
+                config.pupils = { sizePercent: 40, aspect: 1 };
+                config.brows = { visible:true, asymmetric: false, width: 100, thickness: 20, yOffset: 40, angle: 0 };
+                config.mouth = { width: 200, height: 40, yOffset: 150, style: 'solid' };
+                config.colors = { bg:'#2c3e50', eyes:'#ecf0f1', pupils:'#000000', brows:'#ecf0f1', mouth:'#ecf0f1' };
+                config.system.autoAdvanceEnabled = false;
+                config.system.autoAdvanceTime = 2.0;
+                syncUiToConfig();
+                triggerRandomize();
+            };
+            ['bg','eyes','pupils','brows','mouth'].forEach(p => {
+                document.getElementById('col-'+p).addEventListener('input', (e) => {
+                    config.colors[p] = e.target.value;
+                    if(p === 'bg') updateMenuColor();
+                });
+            });
+            const bindRange = (id, group, prop, scale = 1) => {
+                document.getElementById(id).addEventListener('input', (e) => {
+                    config[group][prop] = parseInt(e.target.value) / scale;
+                    if (['eyes','brows','mouth'].includes(group)) enforceConstraints();
+                });
+            };
+            bindRange('rng-breath-speed', 'animation', 'speedMultiplier', 10);
+            bindRange('rng-eye-w', 'eyes', 'w');
+            bindRange('rng-eye-h', 'eyes', 'h');
+            bindRange('rng-eye-gap', 'eyes', 'gap');
+            bindRange('rng-eye-y', 'eyes', 'yOffset');
+            bindRange('rng-pupil-size', 'pupils', 'sizePercent');
+            bindRange('rng-pupil-aspect', 'pupils', 'aspect', 10);
+            bindRange('rng-brow-width', 'brows', 'width');
+            bindRange('rng-brow-thick', 'brows', 'thickness');
+            bindRange('rng-brow-y', 'brows', 'yOffset');
+            bindRange('rng-brow-angle', 'brows', 'angle');
+            bindRange('rng-mouth-w', 'mouth', 'width');
+            bindRange('rng-mouth-h', 'mouth', 'height');
+            bindRange('rng-mouth-y', 'mouth', 'yOffset');
+            document.getElementById('chk-mono').addEventListener('change', (e) => {
+                config.colors.monochromatic = e.target.checked;
+                updateColorsOnly();
+            });
+            document.getElementById('chk-breathing').addEventListener('change', (e) => {
+                config.animation.breathing = e.target.checked;
+            });
+            document.getElementById('chk-mic').addEventListener('change', (e) => {
+                toggleAudio(e.target.checked);
+            });
+            document.getElementById('chk-brows-show').addEventListener('change', (e) => {
+                config.brows.visible = e.target.checked;
+            });
+            document.getElementById('chk-brows-asym').addEventListener('change', (e) => {
+                config.brows.asymmetric = e.target.checked;
+            });
+            document.getElementById('chk-scanlines').addEventListener('change', (e) => {
+                scanlines.style.display = e.target.checked ? 'block' : 'none';
+            });
+            document.getElementById('chk-autoadvance').addEventListener('change', (e) => {
+                config.system.autoAdvanceEnabled = e.target.checked;
+                resetAutoAdvance();
+            });
+            document.getElementById('rng-autoadvance').addEventListener('input', (e) => {
+                config.system.autoAdvanceTime = parseFloat(e.target.value);
+                document.getElementById('lbl-autoadvance-val').innerText = config.system.autoAdvanceTime.toFixed(1);
+                resetAutoAdvance();
+            });
+        }
+
+        function toggleMenu(forceState) {
+            const btn = document.getElementById('menu-btn');
+            if (typeof forceState !== 'undefined') {
+                if (forceState) {
+                    settingsPanel.classList.add('open');
+                    btn.setAttribute('aria-expanded', 'true');
+                } else {
+                    settingsPanel.classList.remove('open');
+                    btn.setAttribute('aria-expanded', 'false');
+                }
+            } else {
+                const isOpen = settingsPanel.classList.toggle('open');
+                btn.setAttribute('aria-expanded', isOpen);
+            }
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function resetAutoAdvance() {
+            if (autoAdvanceInterval) clearInterval(autoAdvanceInterval);
+            if (config.system.autoAdvanceEnabled && config.system.autoAdvanceTime > 0) {
+                const interval = config.system.autoAdvanceTime * 1000;
+                autoAdvanceInterval = setInterval(() => {
+                    if (!settingsPanel.classList.contains('open')) {
+                        triggerRandomize();
+                    }
+                }, interval);
+            }
+        }
+
+        function export4K() {
+            const offCanvas = document.createElement('canvas');
+            offCanvas.width = 3840;
+            offCanvas.height = 2160;
+            const offCtx = offCanvas.getContext('2d');
+            draw(offCtx, 3840, 2160);
+            if (document.getElementById('chk-scanlines').checked) {
+                offCtx.fillStyle = "rgba(0,0,0,0.1)";
+                for(let y=0; y<2160; y+=4) offCtx.fillRect(0, y, 3840, 2);
+            }
+            const link = document.createElement('a');
+            link.download = `computer_Outerface_export_${Date.now()}.png`;
+            link.href = offCanvas.toDataURL();
+            link.click();
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
